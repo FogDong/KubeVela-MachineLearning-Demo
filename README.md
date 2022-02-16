@@ -18,8 +18,8 @@ curl -fsSl https://kubevela.io/script/install.sh | bash -s 1.2.3
 
 ```bash
 vela addon enable fluxcd
-vela addon enable addon/model-training
-vela addon enable addon/model-serving
+vela addon enable model-training
+vela addon enable model-serving
 ```
 
 ## 将 python 代码打包成镜像
