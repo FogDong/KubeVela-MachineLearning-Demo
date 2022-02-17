@@ -1,0 +1,29 @@
+apiVersion: core.oam.dev/v1beta1
+kind: Application
+metadata:
+  name: serving
+  namespace: default
+spec:
+  components:
+  - name: aidemo-serving
+    type: serving
+    properties:
+      predictors:
+        - name: model1
+          replicas: 1
+          # 指定资源
+          resources:
+            memory: 2Gi
+          # 设置自动伸缩
+          autoscaler: 
+            minReplicas: 1
+            maxReplicas: 2
+            metrics:
+              - type: cpu
+                targetAverageUtilization: 80
+          graph:
+            name: my-model
+            # 指定模型服务器
+            implementation: tensorflow
+            # 指定模型地址
+            modelUri: pvc://my-pvc/v1

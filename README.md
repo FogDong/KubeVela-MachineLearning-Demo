@@ -70,11 +70,11 @@ metadata:
   namespace: default
 spec:
   components:
-  - name: aidemo
+  - name: aidemo1
     # 指定类型为 training
     type: training
     properties:
-      # 指定镜像
+      # 指定镜像，训练 v1 版本的模型
       image: fogdong/aidemo:v1.0
       # 指定训练的框架
       framework: tensorflow
@@ -95,6 +95,19 @@ spec:
         # - name: "my-pvc-ref"
         #   mountPath: "/opt/data"
         #   pvcRef: "dataset"
+  - name: aidemo2
+    # 指定类型为 training
+    type: training
+    properties:
+      # 指定镜像，训练 v2 版本的模型
+      image: fogdong/aidemo:v2.0
+      framework: tensorflow
+      env:
+        - name: VERSION
+          value: "v2"
+      storage:
+        - name: "my-pvc"
+          mountPath: "/opt/model"
 ```
 
 ## 启动模型服务
@@ -169,6 +182,7 @@ spec:
       predictors:
         - name: model1
           replicas: 1
+          # v1 版本的模型流量为 75
           traffic: 75
           graph:
             name: my-model
@@ -176,6 +190,7 @@ spec:
             modelUri: pvc://my-pvc/v1
         - name: model2
           replicas: 1
+          # v2 版本的模型流量为 25
           traffic: 25
           graph:
             name: my-model
@@ -223,7 +238,9 @@ spec:
     type: serving
     properties:
       customRouting:
+        # 指定自定义 Header
         header: "test: test"
+        # 指定自定义路由
         serviceName: "main-serving"
       predictors:
         - name: model2

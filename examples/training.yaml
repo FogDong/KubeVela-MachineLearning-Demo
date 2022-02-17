@@ -1,0 +1,45 @@
+apiVersion: core.oam.dev/v1beta1
+kind: Application
+metadata:
+  name: training
+  namespace: default
+spec:
+  components:
+  - name: aidemo1
+    # 指定类型为 training
+    type: training
+    properties:
+      # 指定镜像，训练 v1 版本的模型
+      image: fogdong/aidemo:v1.0
+      # 指定训练的框架
+      framework: tensorflow
+      # 如果需要分布式训练，可以在 distribution 中指定
+      # distribution:
+      #   ps: 1
+      #   worker: 2
+      # 传入环境变量
+      env:
+        - name: VERSION
+          value: "v1"
+      # 挂载存储
+      storage:
+        # 如果没有已存在的 PVC，此处会自动创建一个 PVC 并进行挂载
+        - name: "my-pvc"
+          mountPath: "/opt/model"
+        # 如果已经有一个 PVC，可以指定 PVC 挂载，如：挂在一个带有训练数据的 PVC
+        # - name: "my-pvc-ref"
+        #   mountPath: "/opt/data"
+        #   pvcRef: "dataset"
+  - name: aidemo2
+    # 指定类型为 training
+    type: training
+    properties:
+      # 指定镜像，训练 v2 版本的模型
+      image: fogdong/aidemo:v2.0
+      framework: tensorflow
+      env:
+        - name: VERSION
+          value: "v2"
+      storage:
+        - name: "my-pvc"
+          mountPath: "/opt/model"

@@ -1,0 +1,44 @@
+apiVersion: core.oam.dev/v1beta1
+kind: Application
+metadata:
+  name: simple-example
+  namespace: default
+spec:
+  components:
+  # 训练模型
+  - name: demo-training
+    type: training
+    properties:
+      image: fogdong/aidemo:v1.0
+      framework: tensorflow
+      env:
+        - name: VERSION
+          value: "v1"
+      storage:
+        - name: "my-pvc"
+          mountPath: "/opt/model"
+
+  # 启动 jupyter notebook
+  - name: jupyter
+    type: jupyter-notebook
+    dependsOn:
+      - demo-training
+    properties:
+      serviceType: LoadBalancer
+      storage:
+        - name: "my-pvc"
+          mountPath: "/test"
+  
+  # 启动模型服务
+  - name: demo-serving
+    type: serving
+    dependsOn:
+      - demo-training
+    properties:
+      predictors:
+        - name: model
+          replicas: 1
+          graph:
+            name: my-model
+            implementation: tensorflow
+            modelUri: pvc://my-pvc/v1

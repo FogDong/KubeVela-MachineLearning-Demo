@@ -1,0 +1,32 @@
+apiVersion: core.oam.dev/v1beta1
+kind: Application
+metadata:
+  name: routing-serving
+  namespace: default
+spec:
+  components:
+  - name: main-serving
+    type: serving
+    properties:
+      predictors:
+        - name: model1
+          replicas: 1
+          graph:
+            name: my-model
+            implementation: tensorflow
+            modelUri: pvc://my-pvc/v1
+  - name: test-serving
+    type: serving
+    properties:
+      customRouting:
+        # 指定自定义 Header
+        header: "test: test"
+        # 指定自定义路由
+        serviceName: "main-serving"
+      predictors:
+        - name: model2
+          replicas: 1
+          graph:
+            name: my-model
+            implementation: tensorflow
+            modelUri: pvc://my-pvc/v2

@@ -1,0 +1,27 @@
+apiVersion: core.oam.dev/v1beta1
+kind: Application
+metadata:
+  name: ab-serving
+  namespace: default
+spec:
+  components:
+  - name: ab-serving
+    type: serving
+    properties:
+      predictors:
+        - name: model1
+          replicas: 1
+          # v1 版本的模型流量为 75
+          traffic: 75
+          graph:
+            name: my-model
+            implementation: tensorflow
+            modelUri: pvc://my-pvc/v1
+        - name: model2
+          replicas: 1
+          # v2 版本的模型流量为 25
+          traffic: 25
+          graph:
+            name: my-model
+            implementation: tensorflow
+            modelUri: pvc://my-pvc/v2
