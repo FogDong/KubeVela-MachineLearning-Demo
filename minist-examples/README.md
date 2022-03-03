@@ -1,4 +1,4 @@
-# KubeVela Machine Learning Demo
+# KubeVela Machine Learning Demo With Minist
 
 ## 安装
 
